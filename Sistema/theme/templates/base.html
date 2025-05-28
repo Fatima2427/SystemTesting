@@ -1,0 +1,31 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Hola Django{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'navbar/styles.css' %}" />
+  </head>
+  <body>
+    <div class="layout">
+      <!-- Barra lateral fija -->
+      <nav class="sidebar">
+        <ul>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/proyectos/">Proyectos</a></li>
+          <li><a href="/usuarios/">Usuarios</a></li>
+          <li><a href="/pruebas/">Pruebas</a></li>
+
+        </ul>
+      </nav>
+
+      <!-- Contenido dinámico -->
+      <nav class="contenido">
+        {% block content %}
+        <!-- Aquí se mostrará el contenido de cada vista -->
+        {% endblock %}
+      </nav>
+    </div>
+  </body>
+</html>

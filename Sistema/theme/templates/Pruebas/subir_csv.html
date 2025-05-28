@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Subir archivo CSV de pruebas</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Subir y analizar</button>
+  </form>
+  <a href="{% url 'listar_pruebas' %}">Volver a la lista de pruebas</a>
+{% endblock %}

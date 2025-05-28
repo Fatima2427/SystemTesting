@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Detalles de {{ prueba.nombre }}</h1>
+<p>{{ prueba.descripcion }}</p>
+
+<table border="1">
+  <tr>
+    <th>Nombre</th>
+    <th>Tipo</th>
+    <th>Clasificación ML</th>
+    <th>Score Flaky</th>
+    <th>Estado</th>
+  </tr>
+  {% for detalle in prueba.detalles.all %}
+  <tr>
+    <td>{{ detalle.nombre_test }}</td>
+    <td>{{ detalle.get_tipo_prueba_display }}</td>
+    <td>{{ detalle.clasificacion_ml }}</td>
+    <td>{{ detalle.score_probabilidad_flaky }}</td>
+    <td>{{ detalle.estado|yesno:"Activo,Inactivo" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<a href="{% url 'listar_pruebas' %}">Volver al listado</a>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %} 
+{% block content %}
+<h1>Lista de Proyectos</h1>
+<ul>
+  {% for proyecto in proyectos %}
+    <li>{{ proyecto.nombre }} - {{ proyecto.descripcion }}</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'crear_proyecto' %}">Crear nuevo proyecto</a>
+{% endblock %}

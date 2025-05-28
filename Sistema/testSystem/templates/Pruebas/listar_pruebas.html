@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Listado de Pruebas</h1>
+<ul class="space-y-2">
+  {% for prueba in pruebas %}
+    <li class="p-4 bg-white rounded shadow">
+      <strong>{{ prueba.nombre }}</strong><br>
+      {% if prueba.archivo_csv %}
+        <a href="{{ prueba.archivo_csv.url }}" class="text-blue-500 underline">Descargar CSV</a>
+      {% else %}
+        <p class="text-red-500">No hay archivo disponible</p>
+      {% endif %}
+      <a href="{% url 'detalle_prueba' prueba.id %}" class="ml-2 text-green-600 hover:underline">Ver Detalles</a>
+    </li>
+  {% endfor %}
+</ul>
+<a href="{% url 'crear_prueba' %}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">CREAR PRUEBA</a>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load static %}
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Hola Django{% endblock %}</title>
+    {% tailwind_css %}
+  </head>
+  <body class="bg-gray-100 text-gray-900">
+    <div class="layout flex">
+      <nav class="sidebar w-1/4 bg-blue-800 text-white p-4 min-h-screen">
+        <ul class="space-y-2">
+          <li><a href="/" class="hover:underline">Inicio</a></li>
+          <li><a href="/proyectos/" class="hover:underline">Proyectos</a></li>
+          <li><a href="/usuarios/" class="hover:underline">Usuarios</a></li>
+          <li><a href="/pruebas/" class="hover:underline">Pruebas</a></li>
+        </ul>
+      </nav>
+      <main class="contenido w-3/4 p-6">
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
+  </body>
+</html>

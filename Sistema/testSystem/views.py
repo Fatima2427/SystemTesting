@@ -110,7 +110,7 @@ def listar_pruebas(request):
 
 def detalle_prueba(request, pk):
     prueba = Prueba.objects.get(pk=pk)
-    return render(request, 'pruebas/detalle_prueba.html', {'prueba': prueba})
+    return render(request, 'Pruebas/detalle_prueba.html', {'prueba': prueba})
 
 
 def lista_usuarios(request):

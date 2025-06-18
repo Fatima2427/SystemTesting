@@ -39,11 +39,16 @@ def detectar_pruebas_inestables(df):
     return pd.DataFrame(resultados)
 
 
-def crear_prueba(request):
+def crear_prueba(request, proyecto_pk, modulo_pk):
+    modulo = get_object_or_404(
+        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
+
     if request.method == 'POST':
         form = PruebaForm(request.POST, request.FILES)
         if form.is_valid():
-            prueba = form.save()
+            prueba = form.save(commit=False)
+            prueba.modulo = modulo
+            prueba.save()
             if prueba.archivo:
                 ruta_csv = prueba.archivo.path
                 datos = cargar_datos(ruta_csv)
@@ -57,10 +62,11 @@ def crear_prueba(request):
                         score_probabilidad_flaky=round(fila['Score'], 2),
                         estado=True
                     )
-            return redirect('listar_pruebas')
+            return redirect('ver_modulo', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
     else:
         form = PruebaForm()
-    return render(request, 'pruebas/crear_prueba.html', {'form': form})
+
+    return render(request, 'pruebas/crear_prueba.html', {'form': form, 'modulo': modulo})
 
 
 def listar_pruebas(request):
@@ -68,17 +74,16 @@ def listar_pruebas(request):
     return render(request, 'pruebas/listar_pruebas.html', {'pruebas': pruebas})
 
 
-def ver_prueba(request, pk):
-    prueba = Prueba.objects.get(pk=pk)
-    return render(request, 'Pruebas/detalle_prueba.html', {'prueba': prueba})
+def ver_prueba(request, proyecto_pk, modulo_pk, pk):
+    prueba = get_object_or_404(Prueba, pk=pk, modulo_id=modulo_pk)
+    return render(request, 'pruebas/detalle_prueba.html', {'prueba': prueba})
 
 
-def eliminar_prueba(request, pk):
-    prueba = get_object_or_404(Prueba, pk=pk)
+def eliminar_prueba(request, proyecto_pk, modulo_pk, pk):
+    prueba = get_object_or_404(Prueba, pk=pk, modulo_id=modulo_pk)
     if request.method == 'POST':
         prueba.delete()
-        return redirect('listar_pruebas')
-    return render(request, 'pruebas/confirmar_eliminar.html', {'prueba': prueba})
+        return redirect('pruebas/listar_pruebas.html', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
 
 
 class inicio(TemplateView):
@@ -197,27 +202,33 @@ def eliminar_proyecto(request, pk):
 def ver_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     modulos = proyecto.modulos.all()
-    return render(request, 'proyectos/ver.html', {'proyecto': proyecto, 'modulos': modulos})
+    return render(request, 'proyecto/lista_modulos.html', {'proyecto': proyecto, 'modulos': modulos})
 
 # Módulo de proyectos
 
 
-def crear_modulo(request, proyecto_id):
-    proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
+def crear_modulo(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+
     if request.method == 'POST':
         form = ModuloProyectoForm(request.POST)
         if form.is_valid():
             modulo = form.save(commit=False)
             modulo.proyecto = proyecto
             modulo.save()
-            return redirect('ver_proyecto', pk=proyecto.id)
+            return redirect('ver_proyecto', pk=proyecto.pk)
     else:
         form = ModuloProyectoForm()
-    return render(request, 'modulos/crear.html', {'form': form, 'proyecto': proyecto})
+
+    return render(request, 'modulos/crear_modulo.html', {
+        'form': form,
+        'proyecto': proyecto
+    })
 
 
-def modificar_modulo(request, pk):
-    modulo = get_object_or_404(ModuloProyecto, pk=pk)
+def modificar_modulo(request, proyecto_pk, modulo_pk):
+    modulo = get_object_or_404(
+        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
     form = ModuloProyectoForm(request.POST or None, instance=modulo)
     if form.is_valid():
         form.save()
@@ -225,14 +236,20 @@ def modificar_modulo(request, pk):
     return render(request, 'modulos/modificar.html', {'form': form})
 
 
-def eliminar_modulo(request, pk):
-    modulo = get_object_or_404(ModuloProyecto, pk=pk)
+def eliminar_modulo(request, proyecto_pk, modulo_pk):
+    modulo = get_object_or_404(
+        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
     proyecto_id = modulo.proyecto.id
     modulo.delete()
     return redirect('ver_proyecto', pk=proyecto_id)
 
 
-def ver_modulo(request, pk):
-    modulo = get_object_or_404(ModuloProyecto, pk=pk)
-    pruebas = modulo.prueba_set.all()  # Asumiendo modelo de prueba relacionado
-    return render(request, 'modulos/ver.html', {'modulo': modulo, 'pruebas': pruebas})
+def ver_modulo(request, proyecto_pk, modulo_pk):
+    modulo = get_object_or_404(
+        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
+    pruebas = modulo.pruebas.all()  # si related_name='pruebas'
+    return render(request, 'pruebas/listar_pruebas.html', {
+        'modulo': modulo,
+        'proyecto': modulo.proyecto,
+        'pruebas': pruebas
+    })

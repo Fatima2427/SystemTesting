@@ -57,7 +57,7 @@ class Prueba(models.Model):
     archivo = models.FileField(upload_to='pruebas/')
     fecha = models.DateField(auto_now_add=True)
     modulo = models.ForeignKey(
-        'ModuloProyecto', on_delete=models.CASCADE, related_name='pruebas')
+        ModuloProyecto, on_delete=models.CASCADE, related_name='pruebas')
 
     def __str__(self):
         return self.tipo_prueba

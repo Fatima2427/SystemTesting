@@ -40,7 +40,7 @@ class ModuloProyectoForm(forms.ModelForm):
 class PruebaForm(forms.ModelForm):
     class Meta:
         model = Prueba
-        fields = ['tipo_prueba', 'archivo', 'modulo']
+        fields = ['tipo_prueba', 'archivo']
 
 
 class SubidaCSVForm(forms.Form):

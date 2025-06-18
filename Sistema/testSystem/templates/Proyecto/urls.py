@@ -20,53 +20,25 @@ from django.urls import path
 from . import views
 from .views import inicio
 urlpatterns = [
-    # inicio
-    path('', inicio.as_view(), name='inicio'),
 
-    # usuario
+    path('', inicio.as_view(), name='inicio'),
     path('usuarios/', views.lista_usuarios, name='lista_usuarios'),
     path('usuarios/nuevo/', views.crear_usuario, name='crear_usuario'),
     path('usuarios/modificar/<int:pk>/',
          views.modificar_usuario, name='modificar_usuario'),
     path('usuarios/eliminar/<int:pk>/',
          views.eliminar_usuario, name='eliminar_usuario'),
-    # proyectos
     path('proyectos/nuevo', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/', views.lista_proyectos, name='lista_proyectos'),
     path('proyectos/modificar/<int:pk>/',
          views.modificar_proyecto, name='modificar_proyecto'),
     path('proyectos/eliminar/<int:pk>/',
          views.eliminar_proyecto, name='eliminar_proyecto'),
-
-
-    # modulos
     path('proyectos/<int:pk>/',
          views.ver_proyecto, name='ver_proyecto'),
-    path('proyectos/<int:pk>/modulos/nuevo/',
-         views.crear_modulo, name='crear_modulo'),
-    # Ver módulo específico dentro de un proyecto
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/',
-         views.ver_modulo, name='ver_modulo'),
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/editar/',
-         views.modificar_modulo, name='modificar_modulo'),
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/eliminar/',
-         views.eliminar_modulo, name='eliminar_modulo'),
-
-
-    # pruebas
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/pruebas/nueva/',
-         views.crear_prueba, name='crear_prueba'),
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/pruebas/<int:pk>/ver/',
-         views.ver_prueba, name='ver_prueba'),
-
-    path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/pruebas/<int:pk>/eliminar/',
-         views.eliminar_prueba, name='eliminar_prueba'),
-
-
-
-    # path('pruebas/crear/', views.crear_prueba, name='crear_prueba'),
-    # path('pruebas/', views.listar_pruebas, name='listar_pruebas'),
-    # path('pruebas/<int:pk>/', views.ver_prueba, name='ver_prueba'),
+    path('pruebas/crear/', views.crear_prueba, name='crear_prueba'),
+    path('pruebas/', views.listar_pruebas, name='listar_pruebas'),
+    path('pruebas/<int:pk>/', views.ver_prueba, name='ver_prueba'),
     # path('pruebas/subir_csv/', views.subir_csv, name='subir_csv'),
 
 

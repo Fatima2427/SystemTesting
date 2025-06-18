@@ -1,15 +1,18 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import TemplateView
 
+from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Recomendacion, Resultado, Rol
-from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm
+from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
 # Create your views here.
 import pandas as pd
 from django.core.files.storage import FileSystemStorage
 
+
+# pruebas ----------------
 
 def cargar_datos(path):
     df = pd.read_csv(path)
@@ -184,33 +187,91 @@ def eliminar_rol(request, pk):
 
 
 # PROYECTOS --------------------------
+
+
+@login_required
+def listar_proyectos(request):
+    if request.user.is_superuser:
+        proyectos = Proyecto.objects.all()
+    else:
+        proyectos = request.user.proyectos_asignados.all()
+    return render(request, 'proyectos/listar.html', {'proyectos': proyectos})
+
+
+@login_required
 def crear_proyecto(request):
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('lista_proyectos')
+            proyecto = form.save()
+            proyecto.usuarios.add(request.user)  # Asignar creador
+            return redirect('listar_proyectos')
     else:
         form = ProyectoForm()
-    return render(request, 'Proyecto/crear_proyecto.html', {'form': form})
+    return render(request, 'proyectos/crear.html', {'form': form})
 
 
-def lista_proyectos(request):
-    proyectos = Proyecto.objects.all()
-    return render(request, 'Proyecto/lista_proyectos.html', {'proyectos': proyectos})
+@login_required
+def modificar_proyecto(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    form = ProyectoForm(request.POST or None, instance=proyecto)
+    if form.is_valid():
+        form.save()
+        return redirect('listar_proyectos')
+    return render(request, 'proyectos/modificar.html', {'form': form})
 
 
-def index(request):
-    return HttpResponse("Estas en la página principal")
+@login_required
+def eliminar_proyecto(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    proyecto.delete()
+    return redirect('listar_proyectos')
 
 
-def detail(request, question_id):
-    return HttpResponse(f"Estás viendo la pregunta número {question_id}")
+@login_required
+def ver_proyecto(request, pk):
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    modulos = proyecto.modulos.all()
+    return render(request, 'proyectos/ver.html', {'proyecto': proyecto, 'modulos': modulos})
+
+# Módulo de proyectos
 
 
-def result(request, question_id):
-    return HttpResponse(f"Estás viendo los resultados de la pregunta {question_id}")
+@login_required
+def crear_modulo(request, proyecto_id):
+    proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
+    if request.method == 'POST':
+        form = ModuloProyectoForm(request.POST)
+        if form.is_valid():
+            modulo = form.save(commit=False)
+            modulo.proyecto = proyecto
+            modulo.save()
+            return redirect('ver_proyecto', pk=proyecto.id)
+    else:
+        form = ModuloProyectoForm()
+    return render(request, 'modulos/crear.html', {'form': form, 'proyecto': proyecto})
 
 
-def vote(request, question_id):
-    return HttpResponse(f"Estás votando a la pregunta {question_id}")
+@login_required
+def modificar_modulo(request, pk):
+    modulo = get_object_or_404(ModuloProyecto, pk=pk)
+    form = ModuloProyectoForm(request.POST or None, instance=modulo)
+    if form.is_valid():
+        form.save()
+        return redirect('ver_proyecto', pk=modulo.proyecto.id)
+    return render(request, 'modulos/modificar.html', {'form': form})
+
+
+@login_required
+def eliminar_modulo(request, pk):
+    modulo = get_object_or_404(ModuloProyecto, pk=pk)
+    proyecto_id = modulo.proyecto.id
+    modulo.delete()
+    return redirect('ver_proyecto', pk=proyecto_id)
+
+
+@login_required
+def ver_modulo(request, pk):
+    modulo = get_object_or_404(ModuloProyecto, pk=pk)
+    pruebas = modulo.prueba_set.all()  # Asumiendo modelo de prueba relacionado
+    return render(request, 'modulos/ver.html', {'modulo': modulo, 'pruebas': pruebas})

@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
 
 
 class Rol(models.Model):
@@ -8,6 +8,28 @@ class Rol(models.Model):
 
     def __str__(self):
         return self.nombre
+
+
+class Proyecto(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha = models.DateField()
+    estado = models.CharField(max_length=50)
+    usuarios = models.ManyToManyField(User, related_name='proyectos_asignados')
+
+    def __str__(self):
+        return self.nombre
+
+
+class ModuloProyecto(models.Model):
+    proyecto = models.ForeignKey(
+        Proyecto, on_delete=models.CASCADE, related_name='modulos')
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha = models.DateField()
+
+    def __str__(self):
+        return f"{self.nombre} ({self.proyecto.nombre})"
 
 
 class Usuario(models.Model):
@@ -21,18 +43,6 @@ class Usuario(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 
-class Proyecto(models.Model):
-    nombre = models.CharField(max_length=255)
-    descripcion = models.TextField()
-    fecha_creacion = models.DateField(auto_now_add=True)
-    estado = models.CharField(max_length=50)
-    # Relación con usuarios (si es ManyToMany, ajusta esto)
-    id_participante = models.ForeignKey('Usuario', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.nombre
-
-
 class ParticipantesProyecto(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
@@ -42,22 +52,12 @@ class ParticipantesProyecto(models.Model):
         return f"{self.usuario} - {self.proyecto} ({self.rol})"
 
 
-class ModuloProyecto(models.Model):
-    descripcion = models.TextField()
-    proyecto = models.ForeignKey(
-        Proyecto, on_delete=models.CASCADE, related_name="modulos")
-    fecha_creacion = models.DateField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Módulo de {self.proyecto.nombre}"
-
-
 class Prueba(models.Model):
     tipo_prueba = models.CharField(max_length=100)
     archivo = models.FileField(upload_to='pruebas/')
-    fecha = models.DateField()
+    fecha = models.DateField(auto_now_add=True)
     modulo = models.ForeignKey(
-        ModuloProyecto, on_delete=models.CASCADE, related_name='pruebas')
+        'ModuloProyecto', on_delete=models.CASCADE, related_name='pruebas')
 
     def __str__(self):
         return self.tipo_prueba

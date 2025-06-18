@@ -1,6 +1,6 @@
 # core/forms.py
 from django import forms
-from .models import Usuario, Proyecto, Prueba, Rol, Reporte
+from .models import Usuario, Proyecto, Prueba, Rol, Reporte, ModuloProyecto
 
 
 class UsuarioForm(forms.ModelForm):
@@ -28,13 +28,19 @@ class RolForm(forms.ModelForm):
 class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
-        fields = ['nombre', 'descripcion', 'id_participante', 'estado']
+        fields = ['nombre', 'descripcion', 'fecha', 'estado']
+
+
+class ModuloProyectoForm(forms.ModelForm):
+    class Meta:
+        model = ModuloProyecto
+        fields = ['nombre', 'descripcion', 'fecha']
 
 
 class PruebaForm(forms.ModelForm):
     class Meta:
         model = Prueba
-        fields = ['nombre', 'descripcion', 'archivo_csv']
+        fields = ['tipo_prueba', 'archivo', 'modulo']
 
 
 class SubidaCSVForm(forms.Form):

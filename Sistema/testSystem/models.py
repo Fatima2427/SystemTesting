@@ -9,13 +9,15 @@ class Rol(models.Model):
         return self.nombre
 
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
+class Usuario(AbstractUser):
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
     correo = models.EmailField(unique=True)
     tipo_usuario = models.CharField(max_length=50)
-    contraseña = models.CharField(max_length=128)
-    estado = models.BooleanField(default=True)
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
+
+    USERNAME_FIELD = 'correo'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"

@@ -28,15 +28,19 @@ class Migration(migrations.Migration):
             name='tipo_prueba',
         ),
         migrations.CreateModel(
-            name='DetallePrueba',
+            name='Resultado',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('nombre_test', models.CharField(max_length=200)),
-                ('tipo_prueba', models.CharField(choices=[('unit', 'Unit'), ('integration', 'Integration'), ('e2e', 'End to End')], max_length=50)),
-                ('clasificacion_ml', models.CharField(blank=True, max_length=100, null=True)),
+                ('tipo_prueba', models.CharField(choices=[
+                 ('unit', 'Unit'), ('integration', 'Integration'), ('e2e', 'End to End')], max_length=50)),
+                ('clasificacion_ml', models.CharField(
+                    blank=True, max_length=100, null=True)),
                 ('score_probabilidad_flaky', models.FloatField(default=0.0)),
                 ('estado', models.BooleanField(default=True)),
-                ('prueba', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='detalles', to='testSystem.prueba')),
+                ('prueba', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                 related_name='detalles', to='testSystem.prueba')),
             ],
         ),
     ]

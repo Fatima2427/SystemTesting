@@ -1,23 +1,21 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class Rol(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     caracteristicas = models.TextField()
 
     def __str__(self):
         return self.nombre
 
 
-class Usuario(AbstractUser):
-    nombre = models.CharField(max_length=50)
-    apellido = models.CharField(max_length=50)
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
     correo = models.EmailField(unique=True)
-    tipo_usuario = models.CharField(max_length=50)
+    contrasena = models.CharField(max_length=128)  # hashed
     rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True)
-
-    USERNAME_FIELD = 'correo'
-    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
@@ -55,16 +53,17 @@ class ModuloProyecto(models.Model):
 
 
 class Prueba(models.Model):
-    nombre = models.CharField(max_length=200)
-    descripcion = models.TextField()
-    fecha_creacion = models.DateField(auto_now_add=True)
-    archivo_csv = models.FileField(upload_to='csvs/', null=True, blank=True)
+    tipo_prueba = models.CharField(max_length=100)
+    archivo = models.FileField(upload_to='pruebas/')
+    fecha = models.DateField()
+    modulo = models.ForeignKey(
+        ModuloProyecto, on_delete=models.CASCADE, related_name='pruebas')
 
     def __str__(self):
-        return self.nombre
+        return self.tipo_prueba
 
 
-class DetallePrueba(models.Model):
+class Resultado(models.Model):
     prueba = models.ForeignKey(
         Prueba, related_name='detalles', on_delete=models.CASCADE)
     nombre_test = models.CharField(max_length=200)

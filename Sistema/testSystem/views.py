@@ -4,8 +4,8 @@ from django.views.generic import TemplateView
 
 from django.http import HttpResponse
 
-from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Recomendacion, DetallePrueba
-from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm
+from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Recomendacion, Resultado, Rol
+from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm
 # Create your views here.
 import pandas as pd
 from django.core.files.storage import FileSystemStorage
@@ -56,7 +56,7 @@ def subir_csv(request):
             )
 
             for index, fila in resultados.iterrows():
-                DetallePrueba.objects.create(
+                Resultado.objects.create(
                     prueba=prueba_padre,
                     nombre_test=fila['Test Name'],
                     tipo_prueba='unit',  # o puedes inferirlo
@@ -88,7 +88,7 @@ def crear_prueba(request):
                 resultados = detectar_pruebas_inestables(datos)
 
                 for index, fila in resultados.iterrows():
-                    DetallePrueba.objects.create(
+                    Resultado.objects.create(
                         prueba=prueba,
                         nombre_test=fila['Test Name'],
                         tipo_prueba='unit',  # Cambiar si puedes inferirlo del CSV
@@ -112,6 +112,8 @@ def detalle_prueba(request, pk):
     prueba = Prueba.objects.get(pk=pk)
     return render(request, 'Pruebas/detalle_prueba.html', {'prueba': prueba})
 
+# ----------------------------------------------------------------------Usuarios
+
 
 def lista_usuarios(request):
     usuarios = Usuario.objects.all()
@@ -125,10 +127,63 @@ def crear_usuario(request):
             form.save()
             return redirect('lista_usuarios')
     else:
-        form = UsuarioForm()
+        form = UsuarioForm(
+            initial={'rol': Rol.objects.get_or_create(nombre='Administrador')[0].id})
     return render(request, 'Usuario/crear_usuario.html', {'form': form})
 
 
+def modificar_usuario(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+    form = UsuarioForm(request.POST or None, instance=usuario)
+    if form.is_valid():
+        form.save()
+        return redirect('listar_usuarios')
+    return render(request, 'Usuario/crear_usuario.html', {'form': form})
+
+
+def eliminar_usuario(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+    usuario.delete()
+    return redirect('lista_usuarios')
+
+# Roles
+
+
+def listar_roles(request):
+    roles = Rol.objects.all()
+    return render(request, 'roles/listar.html', {'roles': roles})
+
+
+def crear_rol(request):
+    if request.method == 'POST':
+        form = RolForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_roles')
+    else:
+        form = RolForm()
+    return render(request, 'roles/form.html', {'form': form})
+
+
+def modificar_rol(request, pk):
+    rol = get_object_or_404(Rol, pk=pk)
+    if rol.nombre == 'Administrador':
+        return redirect('listar_roles')
+    form = RolForm(request.POST or None, instance=rol)
+    if form.is_valid():
+        form.save()
+        return redirect('listar_roles')
+    return render(request, 'roles/form.html', {'form': form})
+
+
+def eliminar_rol(request, pk):
+    rol = get_object_or_404(Rol, pk=pk)
+    if rol.nombre != 'Administrador':
+        rol.delete()
+    return redirect('listar_roles')
+
+
+# PROYECTOS --------------------------
 def crear_proyecto(request):
     if request.method == 'POST':
         form = ProyectoForm(request.POST)

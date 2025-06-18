@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
-from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Recomendacion, Resultado, Rol
+from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Resultado, Rol
 from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
 # Create your views here.
 import pandas as pd
@@ -160,11 +160,11 @@ def eliminar_rol(request, pk):
 
 
 def lista_proyectos(request):
-    if request.user.is_superuser:
-        proyectos = Proyecto.objects.all()
+    # if request.user.is_superuser:
+    proyectos = Proyecto.objects.all()
     # else:
-     #   proyectos = request.user.proyectos_asignados.all()
-    return render(request, 'proyectos/listar.html', {'proyectos': proyectos})
+    #   proyectos = request.user.proyectos_asignados.all()
+    return render(request, 'proyecto/lista_proyectos.html', {'proyectos': proyectos})
 
 
 def crear_proyecto(request):
@@ -172,11 +172,11 @@ def crear_proyecto(request):
         form = ProyectoForm(request.POST)
         if form.is_valid():
             proyecto = form.save()
-            proyecto.usuarios.add(request.user)  # Asignar creador
+
             return redirect('lista_proyectos')
     else:
         form = ProyectoForm()
-    return render(request, 'proyectos/crear.html', {'form': form})
+    return render(request, 'proyecto/crear_proyecto.html', {'form': form})
 
 
 def modificar_proyecto(request, pk):
@@ -185,7 +185,7 @@ def modificar_proyecto(request, pk):
     if form.is_valid():
         form.save()
         return redirect('lista_proyectos')
-    return render(request, 'proyectos/modificar.html', {'form': form})
+    return render(request, 'proyecto/modificar.html', {'form': form})
 
 
 def eliminar_proyecto(request, pk):

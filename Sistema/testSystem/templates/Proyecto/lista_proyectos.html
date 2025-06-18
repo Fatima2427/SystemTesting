@@ -1,10 +1,70 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block content %}
-<h1>Lista de Proyectos</h1>
-<ul>
-  {% for proyecto in proyectos %}
-    <li>{{ proyecto.nombre }} - {{ proyecto.descripcion }}</li>
-  {% endfor %}
-</ul>
-<a href="{% url 'crear_proyecto' %}">Crear nuevo proyecto</a>
+<div class="max-w-5xl mx-auto p-6 bg-white rounded-md shadow">
+
+  <!-- Encabezado -->
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Lista de Proyectos</h1>
+    <a href="{% url 'crear_proyecto' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+      + Crear nuevo proyecto
+    </a>
+  </div>
+
+  <!-- Tabla -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Nombre</th>
+          <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Fecha</th>
+          <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        {% for proyecto in proyectos %}
+        <tr>
+          <td class="px-4 py-2 text-sm text-gray-800">{{ proyecto.nombre }}</td>
+          <td class="px-4 py-2 text-sm text-gray-800">{{ proyecto.fecha }}</td>
+          <td class="px-4 py-2 text-center text-sm text-gray-800">
+            <div class="flex justify-center space-x-2">
+
+              <!-- Visualizar -->
+              <a href="{% url 'lista_proyectos' proyecto.pk %}" class="text-indigo-600 hover:text-indigo-800" title="Visualizar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"/>
+                </svg>
+              </a>
+
+              <!-- Editar -->
+              <a href="{% url 'modificar_proyecto' proyecto.pk %}" class="text-blue-600 hover:text-blue-800" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
+                </svg>
+              </a>
+
+              <!-- Eliminar -->
+              <a href="{% url 'eliminar_proyecto' proyecto.pk %}" class="text-red-600 hover:text-red-800" title="Eliminar"
+                 onclick="return confirm('¿Estás seguro de eliminar este proyecto?');">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0V5a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                </svg>
+              </a>
+
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3" class="px-4 py-4 text-center text-sm text-gray-500">No hay proyectos registrados.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

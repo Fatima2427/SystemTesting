@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django_viewcomponent',
     'tailwind',
     'theme2',
+    'widget_tweaks',
     'testSystem',
 ]
 

@@ -9,18 +9,90 @@
   </head>
   <body class="bg-gray-100 text-gray-900">
     <div class="layout flex">
-      <nav class="sidebar w-1/4 bg-blue-800 text-white p-4 min-h-screen">
-        <ul class="space-y-2">
-          <li><a href="/" class="hover:underline">Inicio</a></li>
-          <li><a href="/proyectos/" class="hover:underline">Proyectos</a></li>
-          <li><a href="/usuarios/" class="hover:underline">Usuarios</a></li>
-          <li><a href="/pruebas/" class="hover:underline">Pruebas</a></li>
+
+      <!-- Sidebar -->
+      <nav class="sidebar w-1/4 bg-blue-800 text-white p-6 min-h-screen">
+        <!-- Icono grande de casa -->
+        <div class="flex flex-col items-center mb-8">
+          <svg class="w-12 h-12 text-white mb-2" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6"/>
+          </svg>
+          <span class="text-lg font-bold">Inicio</span>
+        </div>
+
+        <!-- Menú -->
+        <ul class="space-y-4 text-sm">
+          <li>
+            <a href="/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 12l2-2m0 0l7-7 7 7m-2 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6"/>
+              </svg>
+              <span>Inicio</span>
+            </a>
+          </li>
+          <li>
+            <a href="/proyectos/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 17v-2a4 4 0 014-4h3M3 7h18M3 12h18M3 17h6"/>
+              </svg>
+              <span>Proyectos</span>
+            </a>
+          </li>
+          <li>
+            <a href="/usuarios/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M5.121 17.804A9.953 9.953 0 0112 15c2.485 0 4.755.91 6.879 2.404M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/pruebas/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9.75 17L15 12.75 9.75 8.5v8.5zM3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"/>
+              </svg>
+              <span>Pruebas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/roles/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <span>Roles</span>
+            </a>
+          </li>
+          <li>
+            <a href="/reportes/" class="flex items-center space-x-2 hover:text-blue-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 17v-6h13m0 0l-7-7m7 7l-7 7"/>
+              </svg>
+              <span>Reportes</span>
+            </a>
+          </li>
         </ul>
       </nav>
+
+      <!-- Contenido -->
       <main class="contenido w-3/4 p-6">
         {% block content %}
         {% endblock %}
       </main>
+
     </div>
   </body>
 </html>

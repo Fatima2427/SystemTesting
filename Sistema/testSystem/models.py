@@ -91,14 +91,3 @@ class Reporte(models.Model):
 
     def __str__(self):
         return f"Reporte {self.id} - {self.tipo}"
-
-
-class Recomendacion(models.Model):
-    prueba = models.ForeignKey(
-        Prueba, on_delete=models.CASCADE, related_name="recomendaciones")
-    modulo = models.ForeignKey(
-        ModuloProyecto, on_delete=models.CASCADE, related_name="recomendaciones")
-    contenido = models.TextField()
-
-    def __str__(self):
-        return f"Recomendación para {self.prueba.nombre}"

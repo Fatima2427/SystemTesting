@@ -24,13 +24,20 @@ urlpatterns = [
     path('', inicio.as_view(), name='inicio'),
     path('usuarios/', views.lista_usuarios, name='lista_usuarios'),
     path('usuarios/nuevo/', views.crear_usuario, name='crear_usuario'),
+    path('usuarios/modificar/<int:pk>/',
+         views.modificar_usuario, name='modificar_usuario'),
+    path('usuarios/eliminar/<int:pk>/',
+         views.eliminar_usuario, name='eliminar_usuario'),
     path('proyectos/nuevo', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/', views.lista_proyectos, name='lista_proyectos'),
+    path('proyectos/modificar/<int:pk>/',
+         views.modificar_proyecto, name='modificar_proyecto'),
+    path('proyectos/eliminar/<int:pk>/',
+         views.eliminar_proyecto, name='eliminar_proyecto'),
     path('pruebas/crear/', views.crear_prueba, name='crear_prueba'),
     path('pruebas/', views.listar_pruebas, name='listar_pruebas'),
-    path('pruebas/<int:pk>/', views.ver_prueba, name='ver_prueba'),
+    path('pruebas/<int:pk>/', views.lista_proyectos, name='lista_proyectos'),
     # path('pruebas/subir_csv/', views.subir_csv, name='subir_csv'),
-
 
 
 ]

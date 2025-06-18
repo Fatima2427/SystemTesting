@@ -28,8 +28,8 @@ urlpatterns = [
     path('proyectos/', views.lista_proyectos, name='lista_proyectos'),
     path('pruebas/crear/', views.crear_prueba, name='crear_prueba'),
     path('pruebas/', views.listar_pruebas, name='listar_pruebas'),
-    path('pruebas/<int:pk>/', views.detalle_prueba, name='detalle_prueba'),
-    path('pruebas/subir_csv/', views.subir_csv, name='subir_csv'),
+    path('pruebas/<int:pk>/', views.ver_prueba, name='ver_prueba'),
+    # path('pruebas/subir_csv/', views.subir_csv, name='subir_csv'),
 
 
 

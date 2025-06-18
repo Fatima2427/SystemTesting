@@ -14,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 
 # pruebas ----------------
 
+
 def cargar_datos(path):
     df = pd.read_csv(path)
     df['Timestamp'] = pd.to_datetime(df['Timestamp'])
@@ -23,7 +24,6 @@ def cargar_datos(path):
 
 def detectar_pruebas_inestables(df):
     resultados = []
-
     for test_name, grupo in df.groupby('Test Name'):
         estados = grupo['Status'].tolist()
         cambios = sum(estados[i] != estados[i+1]
@@ -36,70 +36,27 @@ def detectar_pruebas_inestables(df):
             'Es Inestable': 'Sí' if flaky else 'No',
             'Score': cambios / len(estados)
         })
-
     return pd.DataFrame(resultados)
 
 
-def subir_csv(request):
-    if request.method == 'POST':
-        form = SubidaCSVForm(request.POST, request.FILES)
-        if form.is_valid():
-            archivo = request.FILES['archivo']
-            fs = FileSystemStorage()
-            filename = fs.save(archivo.name, archivo)
-            ruta = fs.path(filename)
-
-            datos = cargar_datos(ruta)
-            resultados = detectar_pruebas_inestables(datos)
-
-            prueba_padre = Prueba.objects.create(
-                nombre=archivo.name,
-                descripcion='Archivo subido para análisis de pruebas',
-                archivo_csv=archivo
-            )
-
-            for index, fila in resultados.iterrows():
-                Resultado.objects.create(
-                    prueba=prueba_padre,
-                    nombre_test=fila['Test Name'],
-                    tipo_prueba='unit',  # o puedes inferirlo
-                    clasificacion_ml='Inestable' if fila['Es Inestable'] == 'Sí' else 'Estable',
-                    score_probabilidad_flaky=round(fila['Score'], 2),
-                    estado=True
-                )
-            return redirect('listar_pruebas')
-    else:
-        form = SubidaCSVForm()
-    return render(request, 'pruebas/subir_csv.html', {'form': form})
-
-
-class inicio(TemplateView):
-    template_name = 'index2.html'
-
-
-# core/views.py
 def crear_prueba(request):
     if request.method == 'POST':
         form = PruebaForm(request.POST, request.FILES)
         if form.is_valid():
-            prueba = form.save()  # Guarda la Prueba con nombre, descripción y archivo
-
-            # Procesamos el archivo CSV subido
-            if prueba.archivo_csv:
-                ruta_csv = prueba.archivo_csv.path  # Ruta real en el sistema de archivos
+            prueba = form.save()
+            if prueba.archivo:
+                ruta_csv = prueba.archivo.path
                 datos = cargar_datos(ruta_csv)
                 resultados = detectar_pruebas_inestables(datos)
-
                 for index, fila in resultados.iterrows():
                     Resultado.objects.create(
                         prueba=prueba,
                         nombre_test=fila['Test Name'],
-                        tipo_prueba='unit',  # Cambiar si puedes inferirlo del CSV
+                        tipo_prueba='unit',
                         clasificacion_ml='Inestable' if fila['Es Inestable'] == 'Sí' else 'Estable',
                         score_probabilidad_flaky=round(fila['Score'], 2),
                         estado=True
                     )
-
             return redirect('listar_pruebas')
     else:
         form = PruebaForm()
@@ -107,13 +64,26 @@ def crear_prueba(request):
 
 
 def listar_pruebas(request):
-    pruebas = Prueba.objects.all().order_by('-fecha_creacion')
+    pruebas = Prueba.objects.all().order_by('-fecha')
     return render(request, 'pruebas/listar_pruebas.html', {'pruebas': pruebas})
 
 
-def detalle_prueba(request, pk):
+def ver_prueba(request, pk):
     prueba = Prueba.objects.get(pk=pk)
     return render(request, 'Pruebas/detalle_prueba.html', {'prueba': prueba})
+
+
+def eliminar_prueba(request, pk):
+    prueba = get_object_or_404(Prueba, pk=pk)
+    if request.method == 'POST':
+        prueba.delete()
+        return redirect('listar_pruebas')
+    return render(request, 'pruebas/confirmar_eliminar.html', {'prueba': prueba})
+
+
+class inicio(TemplateView):
+    template_name = 'index2.html'
+
 
 # ----------------------------------------------------------------------Usuarios
 
@@ -140,7 +110,7 @@ def modificar_usuario(request, pk):
     form = UsuarioForm(request.POST or None, instance=usuario)
     if form.is_valid():
         form.save()
-        return redirect('listar_usuarios')
+        return redirect('lista_usuarios')
     return render(request, 'Usuario/crear_usuario.html', {'form': form})
 
 
@@ -189,46 +159,41 @@ def eliminar_rol(request, pk):
 # PROYECTOS --------------------------
 
 
-@login_required
-def listar_proyectos(request):
+def lista_proyectos(request):
     if request.user.is_superuser:
         proyectos = Proyecto.objects.all()
-    else:
-        proyectos = request.user.proyectos_asignados.all()
+    # else:
+     #   proyectos = request.user.proyectos_asignados.all()
     return render(request, 'proyectos/listar.html', {'proyectos': proyectos})
 
 
-@login_required
 def crear_proyecto(request):
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
         if form.is_valid():
             proyecto = form.save()
             proyecto.usuarios.add(request.user)  # Asignar creador
-            return redirect('listar_proyectos')
+            return redirect('lista_proyectos')
     else:
         form = ProyectoForm()
     return render(request, 'proyectos/crear.html', {'form': form})
 
 
-@login_required
 def modificar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     form = ProyectoForm(request.POST or None, instance=proyecto)
     if form.is_valid():
         form.save()
-        return redirect('listar_proyectos')
+        return redirect('lista_proyectos')
     return render(request, 'proyectos/modificar.html', {'form': form})
 
 
-@login_required
 def eliminar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     proyecto.delete()
-    return redirect('listar_proyectos')
+    return redirect('lista_proyectos')
 
 
-@login_required
 def ver_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     modulos = proyecto.modulos.all()
@@ -237,7 +202,6 @@ def ver_proyecto(request, pk):
 # Módulo de proyectos
 
 
-@login_required
 def crear_modulo(request, proyecto_id):
     proyecto = get_object_or_404(Proyecto, pk=proyecto_id)
     if request.method == 'POST':
@@ -252,7 +216,6 @@ def crear_modulo(request, proyecto_id):
     return render(request, 'modulos/crear.html', {'form': form, 'proyecto': proyecto})
 
 
-@login_required
 def modificar_modulo(request, pk):
     modulo = get_object_or_404(ModuloProyecto, pk=pk)
     form = ModuloProyectoForm(request.POST or None, instance=modulo)
@@ -262,7 +225,6 @@ def modificar_modulo(request, pk):
     return render(request, 'modulos/modificar.html', {'form': form})
 
 
-@login_required
 def eliminar_modulo(request, pk):
     modulo = get_object_or_404(ModuloProyecto, pk=pk)
     proyecto_id = modulo.proyecto.id
@@ -270,7 +232,6 @@ def eliminar_modulo(request, pk):
     return redirect('ver_proyecto', pk=proyecto_id)
 
 
-@login_required
 def ver_modulo(request, pk):
     modulo = get_object_or_404(ModuloProyecto, pk=pk)
     pruebas = modulo.prueba_set.all()  # Asumiendo modelo de prueba relacionado

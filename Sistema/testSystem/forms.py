@@ -1,16 +1,28 @@
 # core/forms.py
 from django import forms
-from .models import Usuario, Proyecto, Prueba
+from .models import Usuario, Proyecto, Prueba, Rol, Reporte
 
 
 class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['nombre', 'apellido', 'correo',
-                  'tipo_usuario', 'contraseña', 'estado']
+        fields = ['nombre', 'apellido', 'correo', 'contrasena', 'rol']
         widgets = {
-            'contraseña': forms.PasswordInput(),
+            'contrasena': forms.PasswordInput(),
         }
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Aquí puedes agregar hashing de contraseña si es necesario
+        if commit:
+            user.save()
+        return user
+
+
+class RolForm(forms.ModelForm):
+    class Meta:
+        model = Rol
+        fields = ['nombre', 'caracteristicas']
 
 
 class ProyectoForm(forms.ModelForm):

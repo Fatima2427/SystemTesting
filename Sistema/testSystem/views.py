@@ -6,11 +6,17 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Resultado, Rol
-from .forms import UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
+from .forms import CustomUserCreationForm, UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
+from django.contrib.auth.forms import UserChangeForm
+
 # Create your views here.
 import pandas as pd
 from django.core.files.storage import FileSystemStorage
 
+
+class inicio(TemplateView):
+    template_name = 'index2.html'
+# Roles
 
 # pruebas ----------------
 
@@ -81,20 +87,13 @@ def ver_prueba(request, proyecto_pk, modulo_pk, pk):
 
 def eliminar_prueba(request, proyecto_pk, modulo_pk, pk):
     prueba = get_object_or_404(Prueba, pk=pk, modulo_id=modulo_pk)
-    if request.method == 'POST':
-        prueba.delete()
-        return redirect('pruebas/listar_pruebas.html', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
 
-
-class inicio(TemplateView):
-    template_name = 'index2.html'
-
-
-# ----------------------------------------------------------------------Usuarios
+    prueba.delete()
+    return redirect('ver_modulo', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
 
 
 def lista_usuarios(request):
-    usuarios = Usuario.objects.all()
+    usuarios = Usuario.objects.select_related('user', 'rol').all()
     return render(request, 'Usuario/lista_usuarios.html', {'usuarios': usuarios})
 
 
@@ -105,31 +104,45 @@ def crear_usuario(request):
             form.save()
             return redirect('lista_usuarios')
     else:
-        form = UsuarioForm(
-            initial={'rol': Rol.objects.get_or_create(nombre='Administrador')[0].id})
+        form = UsuarioForm()
     return render(request, 'Usuario/crear_usuario.html', {'form': form})
 
 
 def modificar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
-    form = UsuarioForm(request.POST or None, instance=usuario)
-    if form.is_valid():
-        form.save()
-        return redirect('lista_usuarios')
-    return render(request, 'Usuario/crear_usuario.html', {'form': form})
+    user_instance = usuario.user
+
+    if request.method == 'POST':
+        user_form = UserChangeForm(request.POST, instance=user_instance)
+        rol_id = request.POST.get('rol')
+        if user_form.is_valid():
+            user_form.save()
+            if rol_id:
+                usuario.rol_id = rol_id
+                usuario.save()
+            return redirect('lista_usuarios')
+    else:
+        user_form = UserChangeForm(instance=user_instance)
+
+    roles = Rol.objects.all()
+    return render(request, 'Usuario/modificar_usuario.html', {
+        'form': user_form,
+        'usuario': usuario,
+        'roles': roles
+    })
 
 
 def eliminar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
+    user_instance = usuario.user
     usuario.delete()
+    user_instance.delete()  # Elimina también el usuario del sistema auth
     return redirect('lista_usuarios')
-
-# Roles
 
 
 def listar_roles(request):
     roles = Rol.objects.all()
-    return render(request, 'roles/listar.html', {'roles': roles})
+    return render(request, 'roles/lista_roles.html', {'roles': roles})
 
 
 def crear_rol(request):
@@ -137,10 +150,10 @@ def crear_rol(request):
         form = RolForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_roles')
+            return redirect('lista_roles')
     else:
         form = RolForm()
-    return render(request, 'roles/form.html', {'form': form})
+    return render(request, 'roles/crear_rol.html', {'form': form})
 
 
 def modificar_rol(request, pk):

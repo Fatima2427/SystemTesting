@@ -2,37 +2,49 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="max-w-xl mx-auto bg-white rounded shadow p-6">
-  <h2 class="text-xl font-bold text-blue-700 mb-4">Crear Prueba para: {{ modulo.nombre }}</h2>
+<div class="flex items-center justify-center min-h-screen bg-gray-50">
+  <div class="w-full max-w-xl bg-white rounded-md shadow p-6">
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de prueba</label>
-      {{ form.tipo_prueba|add_class:"w-full px-3 py-2 border rounded" }}
+    <div class="mb-6 text-center">
+      <h2 class="text-2xl font-bold text-blue-700">Subir Prueba</h2>
+      <p class="text-gray-600">Módulo: <strong>{{ modulo.nombre }}</strong> | Proyecto: <strong>{{ modulo.proyecto.nombre }}</strong></p>
+      <hr class="mt-3 border-gray-300">
     </div>
 
-    <div class="mb-4">
-      <label class="block text-gray-700 text-sm font-bold mb-2">Archivo</label>
-      {{ form.archivo|add_class:"w-full px-3 py-2 border rounded" }}
-    </div>
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
+      {% csrf_token %}
 
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Guardar Prueba
-    </button>
-    <a href="{% url 'ver_modulo' modulo.proyecto.pk modulo.pk %}" class="ml-4 text-gray-600 hover:underline">
-      Cancelar
-    </a>
-    {% if form.errors %}
-  <div class="text-red-500 bg-red-100 border border-red-400 p-3 rounded mt-4">
-    <strong>Errores:</strong>
-    <ul>
-      {% for field, errors in form.errors.items %}
-        <li>{{ field }}: {{ errors.as_text }}</li>
-      {% endfor %}
-    </ul>
+      <div>
+        <label class="text-sm font-semibold text-gray-700 mb-1 block">Tipo de prueba</label>
+        {{ form.tipo_prueba|add_class:"w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold text-gray-700 mb-1 block">Archivo (.csv)</label>
+        {{ form.archivo|add_class:"w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+      </div>
+
+      {% if form.errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 p-4 rounded">
+          <strong>Errores en el formulario:</strong>
+          <ul class="mt-2 text-sm list-disc list-inside">
+            {% for field, errors in form.errors.items %}
+              <li>{{ field }}: {{ errors|striptags }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="flex justify-between pt-4">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Guardar Prueba
+        </button>
+        <a href="{% url 'ver_modulo' modulo.proyecto.pk modulo.pk %}" class="px-4 py-2 border border-gray-400 text-gray-700 rounded hover:bg-gray-200">
+          Cancelar
+        </a>
+      </div>
+
+    </form>
   </div>
-{% endif %}
-  </form>
 </div>
 {% endblock %}

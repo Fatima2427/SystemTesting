@@ -30,6 +30,17 @@ urlpatterns = [
          views.modificar_usuario, name='modificar_usuario'),
     path('usuarios/eliminar/<int:pk>/',
          views.eliminar_usuario, name='eliminar_usuario'),
+
+
+    # rol
+    path('roles/', views.listar_roles, name='lista_roles'),
+    path('roles/nuevo/', views.crear_rol, name='crear_rol'),
+    path('roles/modificar/<int:pk>/',
+         views.modificar_rol, name='modificar_rol'),
+    path('roles/eliminar/<int:pk>/',
+         views.eliminar_rol, name='eliminar_rol'),
+
+
     # proyectos
     path('proyectos/nuevo', views.crear_proyecto, name='crear_proyecto'),
     path('proyectos/', views.lista_proyectos, name='lista_proyectos'),

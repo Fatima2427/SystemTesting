@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-6 rounded shadow mt-10">
+  <h2 class="text-xl font-bold text-red-700 mb-4">Confirmar Eliminación</h2>
+  <p class="mb-4">
+    ¿Estás seguro de que deseas eliminar la prueba
+    <strong class="text-red-600">{{ prueba.tipo_prueba }}</strong>?
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+       <div class="flex justify-between pt-4">
+      <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+        Eliminar
+      </button>
+      <a href="{% url 'ver_modulo' proyecto_pk modulo_pk %}" class="text-gray-600 hover:underline self-center">
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

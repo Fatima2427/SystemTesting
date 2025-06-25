@@ -10,11 +10,6 @@
       {% csrf_token %}
 
       <div>
-      
-        {{ form.proyecto|add_class:"w-full border border-gray-300 rounded px-4 py-2" }}
-      </div>
-
-      <div>
         <label class="block text-gray-700 font-semibold mb-1">Nombre</label>
         {{ form.nombre|add_class:"w-full border border-gray-300 rounded px-4 py-2" }}
       </div>

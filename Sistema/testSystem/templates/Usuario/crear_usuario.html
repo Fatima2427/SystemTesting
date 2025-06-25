@@ -13,16 +13,63 @@
       <form method="post" class="space-y-4">
         {% csrf_token %}
 
-        {% for field in form.visible_fields %}
-          <div class="flex flex-col w-full">
-            <label class="text-base font-medium text-gray-700 mb-1">{{ field.label }}</label>
-            {{ field|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
-            {% if field.errors %}
-              <p class="text-red-500 text-xs mt-1">{{ field.errors|striptags }}</p>
-            {% endif %}
-          </div>
-        {% endfor %}
+        <!-- Campo: Nombre -->
+        <div class="flex flex-col w-full">
+          <label for="{{ form.first_name.id_for_label }}" class="text-base font-medium text-gray-700 mb-1">Nombre</label>
+          {{ form.first_name|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+          {% if form.first_name.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.first_name.errors|striptags }}</p>
+          {% endif %}
+        </div>
 
+        <!-- Campo: Apellido -->
+        <div class="flex flex-col w-full">
+          <label for="{{ form.last_name.id_for_label }}" class="text-base font-medium text-gray-700 mb-1">Apellido</label>
+          {{ form.last_name|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+          {% if form.last_name.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.last_name.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Campo: Correo -->
+        <div class="flex flex-col w-full">
+          <label for="{{ form.email.id_for_label }}" class="text-base font-medium text-gray-700 mb-1">Correo</label>
+          {{ form.email|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+          {% if form.email.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.email.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Campo: Contraseña -->
+        <div class="flex flex-col w-full">
+          <label for="{{ form.password.id_for_label }}" class="text-base font-medium text-gray-700 mb-1">Contraseña</label>
+          {{ form.password|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+          {% if form.password.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.password.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Campo: Rol -->
+        <div class="flex flex-col w-full">
+          <label for="{{ form.rol.id_for_label }}" class="text-base font-medium text-gray-700 mb-1">Rol</label>
+          {{ form.rol|add_class:"w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+          {% if form.rol.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.rol.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Campo: Proyectos asignados (oculto por defecto) -->
+        <div id="proyectos-container" class="flex flex-col w-full hidden">
+          <label class="text-base font-medium text-gray-700 mb-1">Proyectos asignados</label>
+          <div class="space-y-1">
+            {{ form.proyectos|add_class:"border-gray-300 rounded-md focus:ring-blue-500" }}
+          </div>
+          {% if form.proyectos.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.proyectos.errors|striptags }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Botones -->
         <div class="flex justify-between pt-4">
           <button type="submit" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-base">
             Guardar
@@ -35,4 +82,23 @@
       </form>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const rolSelect = document.getElementById('id_rol');
+      const proyectosContainer = document.getElementById('proyectos-container');
+
+      function toggleProyectos() {
+        const selectedText = rolSelect.options[rolSelect.selectedIndex].text.toLowerCase();
+        if (selectedText !== 'administrador') {
+          proyectosContainer.classList.remove('hidden');
+        } else {
+          proyectosContainer.classList.add('hidden');
+        }
+      }
+
+      rolSelect.addEventListener('change', toggleProyectos);
+      toggleProyectos();  // Ejecutar en carga inicial
+    });
+  </script>
 {% endblock %}

@@ -1,4 +1,7 @@
 
+from .utils import analizar_csv
+from django.contrib import messages
+
 from django.shortcuts import render, get_object_or_404, redirect
 
 from django.views.generic import TemplateView
@@ -28,6 +31,40 @@ def cargar_datos(path):
     return df
 
 
+def subir_prueba(request, proyecto_pk, modulo_pk):
+    modulo = get_object_or_404(
+        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
+
+    if request.method == 'POST':
+        form = PruebaForm(request.POST, request.FILES)
+        if form.is_valid():
+            prueba = form.save(commit=False)
+            prueba.modulo = modulo
+            prueba.save()
+            archivo = pd.read_csv(prueba.archivo.path)
+            tipo_prueba = form.cleaned_data.get('tipo_prueba', 'unit')
+
+            resultados = analizar_csv(prueba.archivo.path)
+
+            for r in resultados:
+                Resultado.objects.create(
+                    prueba=prueba,
+                    nombre_test=r['nombre_test'],
+                    tipo_prueba=tipo_prueba,
+                    clasificacion_ml=r['clasificacion_ml'],
+                    score_probabilidad_flaky=round(
+                        r['score_probabilidad_flaky'], 2),
+                    estado=r['estado']
+                )
+
+            return redirect('ver_modulo', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
+    else:
+        form = PruebaForm()
+
+    return render(request, 'pruebas/crear_prueba.html', {'form': form, 'modulo': modulo})
+# error falso
+
+
 def detectar_pruebas_inestables(df):
     resultados = []
     for test_name, grupo in df.groupby('Test Name'):
@@ -43,6 +80,8 @@ def detectar_pruebas_inestables(df):
             'Score': cambios / len(estados)
         })
     return pd.DataFrame(resultados)
+
+# fake
 
 
 def crear_prueba(request, proyecto_pk, modulo_pk):

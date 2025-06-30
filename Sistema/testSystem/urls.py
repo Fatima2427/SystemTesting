@@ -66,7 +66,7 @@ urlpatterns = [
 
     # pruebas
     path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/pruebas/nueva/',
-         views.crear_prueba, name='crear_prueba'),
+         views.subir_prueba, name='subir_prueba'),
     path('proyectos/<int:proyecto_pk>/modulos/<int:modulo_pk>/pruebas/<int:pk>/ver/',
          views.ver_prueba, name='ver_prueba'),
 

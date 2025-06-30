@@ -1,0 +1,14 @@
+Test Name,Status
+tests/test_api.py::TestLogin::test_login_success,Passed
+tests/test_api.py::TestLogin::test_login_success,Failed
+tests/test_api.py::TestLogin::test_login_success,Passed
+tests/test_api.py::TestRegister::test_register_user,Passed
+tests/test_register.py::test_missing_email,Passed
+tests/test_register.py::test_missing_email,Passed
+tests/test_register.py::test_missing_email,Failed
+tests/test_payment.py::TestPayment::test_successful_payment,Passed
+tests/test_payment.py::TestPayment::test_successful_payment,Passed
+tests/test_payment.py::TestPayment::test_successful_payment,Passed
+tests/test_payment.py::TestPayment::test_payment_timeout,Failed
+tests/test_payment.py::TestPayment::test_payment_timeout,Passed
+tests/test_payment.py::TestPayment::test_payment_timeout,Failed

@@ -1,7 +1,53 @@
-{% extends "base.html" %} {% block title %} Página Principal {% endblock %} 
+{% extends "base.html" %}
+{% block title %} Página Principal {% endblock %}
+
 {% block content %}
-<div class="contenedor">
-  <h1>¡Hola, Django con CSS!</h1>
-  <p>Este es un ejemplo básico usando HTML y estilos CSS.</p>
+<div class="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow">
+
+  <!-- Mensaje de bienvenida -->
+  <h1 class="text-2xl font-bold text-blue-800 mb-4">¡Bienvenido usuario: a!</h1>
+
+  <!-- Descripción -->
+  <p class="text-gray-700 mb-6">A continuación se presenta una tabla resumen con los tipos más comunes de pruebas inestables (Flaky Tests):</p>
+
+  <!-- Tabla de tipos de pruebas flaky -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 text-sm rounded-lg shadow">
+      <thead class="bg-blue-100 text-blue-900">
+        <tr>
+          <th class="px-4 py-2 text-left">Código</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Descripción</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-800">
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">OD</td>
+          <td class="px-4 py-2">Order-Dependent</td>
+          <td class="px-4 py-2">Pruebas cuya ejecución exitosa o fallida depende del orden en que se ejecutan con respecto a otras pruebas.</td>
+        </tr>
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">OD-Brit</td>
+          <td class="px-4 py-2">Order-Dependent Brittle</td>
+          <td class="px-4 py-2">Variante más frágil de OD, donde pequeñas variaciones en el entorno o código provocan fallos con mayor frecuencia.</td>
+        </tr>
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">OD-Vic</td>
+          <td class="px-4 py-2">Order-Dependent Victim</td>
+          <td class="px-4 py-2">Pruebas que fallan cuando son afectadas por otras pruebas que modifican el estado global (son víctimas del orden).</td>
+        </tr>
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">NOD</td>
+          <td class="px-4 py-2">Non-Order-Dependent</td>
+          <td class="px-4 py-2">Pruebas que fallan aleatoriamente, independientemente del orden de ejecución. Suelen deberse a condiciones no determinísticas o dependencias externas.</td>
+        </tr>
+        <tr class="border-t hover:bg-gray-50">
+          <td class="px-4 py-2 font-semibold">NIO</td>
+          <td class="px-4 py-2">Non-Idempotent Outcome</td>
+          <td class="px-4 py-2">Pruebas que presentan fallos en ejecuciones repetidas. Suelen pasar al primer intento y fallar al segundo, reflejando problemas de idempotencia o manejo incorrecto del estado.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

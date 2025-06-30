@@ -44,13 +44,14 @@
                 </svg>
               </a>
 
-                <!-- Modificar -->
-<a href="{% url 'modificar_modulo' proyecto.pk modulo.pk %}" class="text-blue-600 hover:text-blue-800" title="Editar">
-                <!-- Ícono lápiz -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
-                </svg>
-              </a>
+      <!-- Modificar (Deshabilitado) -->
+<span class="text-gray-400 cursor-not-allowed" title="Funcionalidad no disponible aún">
+  <!-- Ícono lápiz -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
+  </svg>
+</span>
+
                   <!-- Eliminar -->
                   <a href="{% url 'eliminar_modulo' proyecto.pk modulo.pk %}" class="text-red-600 hover:text-red-800" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">
                 <!-- Ícono papelera -->

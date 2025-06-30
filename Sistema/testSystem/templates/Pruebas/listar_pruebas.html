@@ -4,6 +4,17 @@
 <div class="max-w-5xl mx-auto bg-white rounded-lg shadow p-6">
   <h2 class="text-2xl font-bold text-blue-800 mb-4">Pruebas del módulo: {{ modulo.nombre }}</h2>
 
+  <!-- Información sobre tipos de pruebas -->
+  <div class="bg-blue-50 border-l-4 border-blue-300 p-4 text-sm text-blue-900 rounded mb-4">
+    <ul class="list-disc pl-5 space-y-1">
+      <li><strong>OD</strong> (Order-Dependent): Dependen del orden de ejecución.</li>
+      <li><strong>OD-Brit</strong> (Order-Dependent Brittle): Más frágiles, fallan por pequeñas variaciones.</li>
+      <li><strong>OD-Vic</strong> (Order-Dependent Victim): Afectadas por otras pruebas que modifican el estado.</li>
+      <li><strong>NOD</strong> (Non-Order-Dependent): Fallan aleatoriamente, por condiciones no determinísticas.</li>
+      <li><strong>NIO</strong> (Non-Idempotent Outcome): Fallan en ejecuciones repetidas por problemas de estado.</li>
+    </ul>
+  </div>
+
   <div class="mb-4">
     <a href="{% url 'subir_prueba' proyecto.pk modulo.pk %}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
       + Nueva Prueba
@@ -26,22 +37,20 @@
     <td class="px-4 py-2">{{ prueba.tipo_prueba }}</td>
 
     <td class="px-4 py-2">
-      <a href="{{ prueba.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-1" title="Descargar">
-        <!-- Ícono de descarga -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
-        </svg>
-        Descargar
-      </a>
-    </td>
+  <a href="{{ prueba.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center gap-1" title="Descargar">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/>
+    </svg>
+    Descargar
+  </a>
+</td>
+
 
     <td class="px-4 py-2">{{ prueba.fecha }}</td>
 
     <td class="px-4 py-2 flex gap-3 items-center">
-      <!-- Ver -->
       <a href="{% url 'ver_prueba' proyecto.pk modulo.pk prueba.pk %}" class="text-blue-600 hover:text-blue-800" title="Ver">
-        <!-- Ícono de ojo -->
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -50,11 +59,9 @@
         </svg>
       </a>
 
-      <!-- Eliminar -->
       <a href="{% url 'eliminar_prueba' proyecto.pk modulo.pk prueba.pk %}"
          class="text-red-600 hover:text-red-800" title="Eliminar"
          onclick="return confirm('¿Estás seguro de eliminar este Archivo de Prueba?');">
-        <!-- Ícono papelera -->
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0V5a1 1 0 011-1h4a1 1 0 011 1v2"/>

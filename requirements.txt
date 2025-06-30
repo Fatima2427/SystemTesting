@@ -1,1 +1,10 @@
 django-viewcomponent == 1.0.5
+
+
+#ML
+pandas
+gitpython
+scikit-learn
+seaborn
+matplotlib
+joblib

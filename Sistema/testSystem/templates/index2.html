@@ -4,8 +4,9 @@
 {% block content %}
 <div class="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow">
 
-  <!-- Mensaje de bienvenida -->
-  <h1 class="text-2xl font-bold text-blue-800 mb-4">¡Bienvenido usuario: a!</h1>
+<h1 class="text-2xl font-bold text-blue-800 mb-4">
+  ¡Bienvenido usuario: {{ request.user.first_name }} {{ request.user.last_name }}!
+</h1>
 
   <!-- Descripción -->
   <p class="text-gray-700 mb-6">A continuación se presenta una tabla resumen con los tipos más comunes de pruebas inestables (Flaky Tests):</p>

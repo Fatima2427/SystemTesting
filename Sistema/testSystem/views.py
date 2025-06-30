@@ -1,15 +1,16 @@
 
 from .utils import analizar_csv
-from django.contrib import messages
+
 
 from django.shortcuts import render, get_object_or_404, redirect
-
+from django.contrib.auth import authenticate, login
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Resultado, Rol
-from .forms import CustomUserCreationForm, UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
+from .forms import LoginForm, CustomUserCreationForm, UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
 from django.contrib.auth.forms import UserChangeForm
 
 # Create your views here.
@@ -17,8 +18,47 @@ import pandas as pd
 from django.core.files.storage import FileSystemStorage
 
 
-class inicio(TemplateView):
+def login_view(request):
+    error = None
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+
+                try:
+                    usuario = Usuario.objects.get(user=user)
+                    return redirect('inicio')
+                   # if usuario.rol.nombre.lower() == 'administrador':
+                    # cambia esto por tu vista real
+                    #    return redirect('vista_administrador')
+                  #  else:
+                    # cambia esto por tu vista real
+                   #     return redirect('vista_usuario')
+                except Usuario.DoesNotExist:
+                    error = 'El usuario no tiene un perfil asignado.'
+            else:
+                error = 'Credenciales inválidas'
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', {'form': form, 'error': error})
+
+
+class inicio(LoginRequiredMixin, TemplateView):
     template_name = 'index2.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        usuario = Usuario.objects.get(user=self.request.user)
+        context['usuario'] = usuario
+        return context
+
 # Roles
 
 # pruebas ----------------

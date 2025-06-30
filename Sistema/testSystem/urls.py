@@ -19,10 +19,11 @@ from django.conf.urls.static import static
 from django.urls import path
 
 from . import views
-from .views import inicio
+from .views import inicio, login_view
 urlpatterns = [
     # inicio
-    path('', inicio.as_view(), name='inicio'),
+    path('home', inicio.as_view(), name='inicio'),
+    path('', login_view, name='login'),
 
     # usuario
     path('usuarios/', views.lista_usuarios, name='lista_usuarios'),

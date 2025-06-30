@@ -5,6 +5,11 @@ from .models import Usuario, Proyecto, Prueba, Rol, Reporte, ModuloProyecto
 from django.forms import ModelForm
 
 
+class LoginForm(forms.Form):
+    username = forms.CharField(label='Correo')
+    password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
+
+
 class CustomUserCreationForm(UserCreationForm):
     """Formulario para crear un usuario del sistema y asociarlo al modelo Usuario"""
     rol = forms.ModelChoiceField(queryset=Rol.objects.all(), required=True)

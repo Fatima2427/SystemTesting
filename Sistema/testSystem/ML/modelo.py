@@ -9,7 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import joblib
 df = pd.read_csv("py-data.csv")
-df_sample = df.head(100)
+df_sample = df.head(800)
 
 
 def clone_and_get_test_code(project_url, sha, test_path):

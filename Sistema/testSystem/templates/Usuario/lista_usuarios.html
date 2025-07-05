@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="max-w-5xl mx-auto p-6 bg-white rounded-md shadow">
+<div class="max-w-6xl mx-auto p-6 bg-white rounded-md shadow">
 
   <!-- Encabezado -->
   <div class="flex items-center justify-between mb-6">
@@ -18,28 +18,57 @@
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Nombre</th>
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Correo</th>
           <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Rol</th>
+          <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Proyectos</th>
           <th class="px-4 py-2 text-center text-sm font-semibold text-gray-700">Acciones</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
         {% for usuario in usuarios %}
         <tr>
-   <td class="px-4 py-2 text-sm text-gray-800">{{ usuario.user.first_name }} {{ usuario.user.last_name }}</td>
-<td class="px-4 py-2 text-sm text-gray-800">{{ usuario.user.email }}</td>
-          <td class="px-4 py-2 text-sm text-gray-800">{{ usuario.rol }}</td>
+          <!-- Nombre -->
+          <td class="px-4 py-2 text-sm text-gray-800">
+            {{ usuario.user.first_name }} {{ usuario.user.last_name }}
+          </td>
+
+          <!-- Correo -->
+          <td class="px-4 py-2 text-sm text-gray-800">
+            {{ usuario.user.email }}
+          </td>
+
+          <!-- Rol -->
+          <td class="px-4 py-2 text-sm text-gray-800">
+            {{ usuario.rol }}
+          </td>
+
+          <!-- Proyectos -->
+          <td class="px-4 py-2 text-sm text-gray-800">
+            {% if usuario.rol.nombre|lower == 'administrador' %}
+              <span class="text-green-600 font-medium">Acceso total</span>
+            {% else %}
+              {% if usuario.proyectos_asignados.all %}
+                <ul class="list-disc list-inside text-gray-700 text-sm">
+                  {% for proyecto in usuario.proyectos_asignados.all %}
+                    <li>{{ proyecto.nombre }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <span class="text-gray-500 italic">Sin proyectos asignados</span>
+              {% endif %}
+            {% endif %}
+          </td>
+
+          <!-- Acciones -->
           <td class="px-4 py-2 text-center text-sm text-gray-800">
             <div class="flex justify-center space-x-2">
-                    <!-- Modificar (Deshabilitado) -->
-<span class="text-gray-400 cursor-not-allowed" title="Funcionalidad no disponible aún">
-  <!-- Ícono lápiz -->
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
-  </svg>
-</span>
+              <!-- Editar (deshabilitado) -->
+              <span class="text-gray-400 cursor-not-allowed" title="Funcionalidad no disponible aún">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
+                </svg>
+              </span>
 
-              <!-- Botón Eliminar -->
+              <!-- Eliminar -->
               <a href="{% url 'eliminar_usuario' usuario.pk %}" class="text-red-600 hover:text-red-800" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este usuario?');">
-                <!-- Ícono papelera -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0V5a1 1 0 011-1h4a1 1 0 011 1v2" />
                 </svg>
@@ -49,7 +78,7 @@
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4" class="px-4 py-4 text-center text-sm text-gray-500">No hay usuarios registrados.</td>
+          <td colspan="5" class="px-4 py-4 text-center text-sm text-gray-500">No hay usuarios registrados.</td>
         </tr>
         {% endfor %}
       </tbody>

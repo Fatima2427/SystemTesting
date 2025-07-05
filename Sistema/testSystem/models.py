@@ -62,19 +62,18 @@ class Prueba(models.Model):
 
 class Resultado(models.Model):
     prueba = models.ForeignKey(
-        Prueba, related_name='detalles', on_delete=models.CASCADE)
+        'Prueba', related_name='detalles', on_delete=models.CASCADE)
+
     nombre_test = models.CharField(max_length=200)
-    tipo_prueba = models.CharField(max_length=50, choices=(
-        ('unit', 'Unit'),
-        ('integration', 'Integration'),
-        ('e2e', 'End to End'),
-    ))
+
     clasificacion_ml = models.CharField(max_length=100, blank=True, null=True)
     score_probabilidad_flaky = models.FloatField(default=0.0)
+    detalle_probabilidades = models.JSONField(
+        blank=True, null=True)  # 👈 Nuevo campo
     estado = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.nombre_test
+        return f"{self.nombre_test} - {self.clasificacion_ml}"
 
 
 class Reporte(models.Model):

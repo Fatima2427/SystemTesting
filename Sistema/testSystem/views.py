@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-
+from .decorators import rol_requerido
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Usuario, Proyecto, Prueba, ModuloProyecto, Reporte, Resultado, Rol
 from .forms import LoginForm, CustomUserCreationForm, UsuarioForm, ProyectoForm, PruebaForm, SubidaCSVForm, RolForm, ModuloProyecto, ModuloProyectoForm
@@ -70,7 +70,10 @@ def cargar_datos(path):
     df = df.sort_values(by=['Test Name', 'Timestamp'])
     return df
 
+# verdadero
 
+
+@login_required
 def subir_prueba(request, proyecto_pk, modulo_pk):
     modulo = get_object_or_404(
         ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
@@ -81,19 +84,20 @@ def subir_prueba(request, proyecto_pk, modulo_pk):
             prueba = form.save(commit=False)
             prueba.modulo = modulo
             prueba.save()
-            archivo = pd.read_csv(prueba.archivo.path)
-            tipo_prueba = form.cleaned_data.get('tipo_prueba', 'unit')
 
+            # Procesar CSV y obtener resultados
             resultados = analizar_csv(prueba.archivo.path)
 
             for r in resultados:
                 Resultado.objects.create(
                     prueba=prueba,
                     nombre_test=r['nombre_test'],
-                    tipo_prueba=tipo_prueba,
+
                     clasificacion_ml=r['clasificacion_ml'],
                     score_probabilidad_flaky=round(
                         r['score_probabilidad_flaky'], 2),
+                    detalle_probabilidades=r.get(
+                        'detalle_probabilidades'),
                     estado=r['estado']
                 )
 
@@ -102,68 +106,21 @@ def subir_prueba(request, proyecto_pk, modulo_pk):
         form = PruebaForm()
 
     return render(request, 'pruebas/crear_prueba.html', {'form': form, 'modulo': modulo})
-# error falso
 
 
-def detectar_pruebas_inestables(df):
-    resultados = []
-    for test_name, grupo in df.groupby('Test Name'):
-        estados = grupo['Status'].tolist()
-        cambios = sum(estados[i] != estados[i+1]
-                      for i in range(len(estados)-1))
-        flaky = cambios >= 2
-        resultados.append({
-            'Test Name': test_name,
-            'Total Runs': len(estados),
-            'Cambios de Estado': cambios,
-            'Es Inestable': 'Sí' if flaky else 'No',
-            'Score': cambios / len(estados)
-        })
-    return pd.DataFrame(resultados)
-
-# fake
-
-
-def crear_prueba(request, proyecto_pk, modulo_pk):
-    modulo = get_object_or_404(
-        ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
-
-    if request.method == 'POST':
-        form = PruebaForm(request.POST, request.FILES)
-        if form.is_valid():
-            prueba = form.save(commit=False)
-            prueba.modulo = modulo
-            prueba.save()
-            if prueba.archivo:
-                ruta_csv = prueba.archivo.path
-                datos = cargar_datos(ruta_csv)
-                resultados = detectar_pruebas_inestables(datos)
-                for index, fila in resultados.iterrows():
-                    Resultado.objects.create(
-                        prueba=prueba,
-                        nombre_test=fila['Test Name'],
-                        tipo_prueba='unit',
-                        clasificacion_ml='Inestable' if fila['Es Inestable'] == 'Sí' else 'Estable',
-                        score_probabilidad_flaky=round(fila['Score'], 2),
-                        estado=True
-                    )
-            return redirect('ver_modulo', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
-    else:
-        form = PruebaForm()
-
-    return render(request, 'pruebas/crear_prueba.html', {'form': form, 'modulo': modulo})
-
-
+@login_required
 def listar_pruebas(request):
     pruebas = Prueba.objects.all().order_by('-fecha')
     return render(request, 'pruebas/listar_pruebas.html', {'pruebas': pruebas})
 
 
+@login_required
 def ver_prueba(request, proyecto_pk, modulo_pk, pk):
     prueba = get_object_or_404(Prueba, pk=pk, modulo_id=modulo_pk)
     return render(request, 'pruebas/detalle_prueba.html', {'prueba': prueba})
 
 
+@login_required
 def eliminar_prueba(request, proyecto_pk, modulo_pk, pk):
     prueba = get_object_or_404(Prueba, pk=pk, modulo_id=modulo_pk)
 
@@ -171,11 +128,15 @@ def eliminar_prueba(request, proyecto_pk, modulo_pk, pk):
     return redirect('ver_modulo', proyecto_pk=proyecto_pk, modulo_pk=modulo_pk)
 
 
+@login_required
+@rol_requerido('Administrador')
 def lista_usuarios(request):
     usuarios = Usuario.objects.select_related('user', 'rol').all()
     return render(request, 'Usuario/lista_usuarios.html', {'usuarios': usuarios})
 
 
+@login_required
+@rol_requerido('Administrador')
 def crear_usuario(request):
     if request.method == 'POST':
         form = UsuarioForm(request.POST)
@@ -187,6 +148,8 @@ def crear_usuario(request):
     return render(request, 'Usuario/crear_usuario.html', {'form': form})
 
 
+@rol_requerido('Administrador')
+@login_required
 def modificar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
     user_instance = usuario.user
@@ -211,6 +174,8 @@ def modificar_usuario(request, pk):
     })
 
 
+@login_required
+@rol_requerido('Administrador')
 def eliminar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
     user_instance = usuario.user
@@ -219,11 +184,15 @@ def eliminar_usuario(request, pk):
     return redirect('lista_usuarios')
 
 
+@login_required
+@rol_requerido('Administrador')
 def listar_roles(request):
     roles = Rol.objects.all()
     return render(request, 'roles/lista_roles.html', {'roles': roles})
 
 
+@login_required
+@rol_requerido('Administrador')
 def crear_rol(request):
     if request.method == 'POST':
         form = RolForm(request.POST)
@@ -235,17 +204,8 @@ def crear_rol(request):
     return render(request, 'roles/crear_rol.html', {'form': form})
 
 
-def modificar_rol(request, pk):
-    rol = get_object_or_404(Rol, pk=pk)
-    if rol.nombre == 'Administrador':
-        return redirect('listar_roles')
-    form = RolForm(request.POST or None, instance=rol)
-    if form.is_valid():
-        form.save()
-        return redirect('listar_roles')
-    return render(request, 'roles/form.html', {'form': form})
-
-
+@login_required
+@rol_requerido('Administrador')
 def eliminar_rol(request, pk):
     rol = get_object_or_404(Rol, pk=pk)
     if rol.nombre != 'Administrador':
@@ -255,12 +215,13 @@ def eliminar_rol(request, pk):
 
 # PROYECTOS --------------------------
 
-
+@login_required
 def lista_proyectos(request):
-    # if request.user.is_superuser:
-    proyectos = Proyecto.objects.all()
-    # else:
-    #   proyectos = request.user.proyectos_asignados.all()
+    usuario = request.user.usuario
+    if usuario.rol.nombre.lower() != 'administrador':
+        proyectos = usuario.proyectos_asignados.all()
+    else:
+        proyectos = Proyecto.objects.all()
     return render(request, 'proyecto/lista_proyectos.html', {'proyectos': proyectos})
 
 

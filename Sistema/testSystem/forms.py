@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Proyecto, Prueba, Rol, Reporte, ModuloProyecto
+from .models import Usuario, Proyecto, Prueba, Rol, Reporte, ModuloProyecto, UsuarioProyecto
 from django.forms import ModelForm
 
 
@@ -42,10 +42,24 @@ class UsuarioForm(forms.ModelForm):
 
     class Meta:
         model = Usuario
-        fields = ['rol']  # Solo campos del modelo Usuario
+        # Solo campos del modelo Usuario (los demás son campos externos)
+        fields = ['rol']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        rol = cleaned_data.get('rol')
+        proyectos = cleaned_data.get('proyectos')
+
+        if rol and rol.nombre.lower() != 'administrador' and not proyectos:
+            raise forms.ValidationError(
+                "Debe seleccionar al menos un proyecto si el rol no es Administrador.")
+        return cleaned_data
 
     def save(self, commit=True):
         rol = self.cleaned_data['rol']
+        proyectos = self.cleaned_data.get('proyectos', [])
+
+        # Crear usuario del modelo User
         user = User.objects.create_user(
             username=self.cleaned_data['email'],
             first_name=self.cleaned_data['first_name'],
@@ -53,14 +67,21 @@ class UsuarioForm(forms.ModelForm):
             email=self.cleaned_data['email'],
             password=self.cleaned_data['password']
         )
+
+        # Crear el objeto Usuario
         usuario = super().save(commit=False)
         usuario.user = user
         usuario.rol = rol
+
         if commit:
             usuario.save()
+
+            # Si no es administrador, asociar proyectos usando el modelo intermedio
             if rol.nombre.lower() != 'administrador':
-                usuario.user.proyectos_asignados.set(
-                    self.cleaned_data['proyectos'])
+                for proyecto in proyectos:
+                    UsuarioProyecto.objects.create(
+                        usuario=usuario, proyecto=proyecto)
+
         return usuario
 
 

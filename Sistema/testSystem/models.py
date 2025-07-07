@@ -22,7 +22,7 @@ class Proyecto(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     fecha = models.DateField()
-    estado = models.CharField(max_length=50)
+
     usuarios = models.ManyToManyField(
         Usuario, through='UsuarioProyecto', related_name='proyectos_asignados')
 

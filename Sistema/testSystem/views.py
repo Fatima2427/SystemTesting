@@ -148,8 +148,8 @@ def crear_usuario(request):
     return render(request, 'Usuario/crear_usuario.html', {'form': form})
 
 
-@rol_requerido('Administrador')
 @login_required
+@rol_requerido('Administrador')
 def modificar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
     user_instance = usuario.user
@@ -225,6 +225,8 @@ def lista_proyectos(request):
     return render(request, 'proyecto/lista_proyectos.html', {'proyectos': proyectos})
 
 
+@login_required
+@rol_requerido('Administrador')
 def crear_proyecto(request):
     if request.method == 'POST':
         form = ProyectoForm(request.POST)
@@ -237,21 +239,24 @@ def crear_proyecto(request):
     return render(request, 'proyecto/crear_proyecto.html', {'form': form})
 
 
+@login_required
 def modificar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     form = ProyectoForm(request.POST or None, instance=proyecto)
     if form.is_valid():
         form.save()
         return redirect('lista_proyectos')
-    return render(request, 'proyecto/modificar.html', {'form': form})
+    return render(request, 'proyecto/crear_proyecto.html', {'form': form})
 
 
+@login_required
 def eliminar_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     proyecto.delete()
     return redirect('lista_proyectos')
 
 
+@login_required
 def ver_proyecto(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
     modulos = proyecto.modulos.all()
@@ -260,6 +265,7 @@ def ver_proyecto(request, pk):
 # Módulo de proyectos
 
 
+@login_required
 def crear_modulo(request, pk):
     proyecto = get_object_or_404(Proyecto, pk=pk)
 
@@ -279,6 +285,7 @@ def crear_modulo(request, pk):
     })
 
 
+@login_required
 def modificar_modulo(request, proyecto_pk, modulo_pk):
     modulo = get_object_or_404(
         ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
@@ -289,6 +296,7 @@ def modificar_modulo(request, proyecto_pk, modulo_pk):
     return render(request, 'modulos/modificar.html', {'form': form})
 
 
+@login_required
 def eliminar_modulo(request, proyecto_pk, modulo_pk):
     modulo = get_object_or_404(
         ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)
@@ -297,6 +305,7 @@ def eliminar_modulo(request, proyecto_pk, modulo_pk):
     return redirect('ver_proyecto', pk=proyecto_id)
 
 
+@login_required
 def ver_modulo(request, proyecto_pk, modulo_pk):
     modulo = get_object_or_404(
         ModuloProyecto, pk=modulo_pk, proyecto_id=proyecto_pk)

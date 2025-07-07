@@ -94,7 +94,7 @@ class RolForm(forms.ModelForm):
 class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
-        fields = ['nombre', 'descripcion', 'fecha', 'estado']
+        fields = ['nombre', 'descripcion', 'fecha']
 
 
 class ModuloProyectoForm(forms.ModelForm):

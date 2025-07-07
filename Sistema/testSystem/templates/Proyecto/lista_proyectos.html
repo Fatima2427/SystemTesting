@@ -2,13 +2,15 @@
 {% block content %}
 <div class="max-w-5xl mx-auto p-6 bg-white rounded-md shadow">
 
-  <!-- Encabezado -->
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Lista de Proyectos</h1>
+<!-- Encabezado -->
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">Lista de Proyectos</h1>
+  {% if usuario.rol.nombre|lower == 'administrador' %}
     <a href="{% url 'crear_proyecto' %}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
       + Crear nuevo proyecto
     </a>
-  </div>
+  {% endif %}
+</div>
 
   <!-- Tabla -->
   <div class="overflow-x-auto">
@@ -39,13 +41,12 @@
               </a>
 
               <!-- Editar -->
-                    <!-- Modificar (Deshabilitado) -->
-<span class="text-gray-400 cursor-not-allowed" title="Funcionalidad no disponible aún">
-  <!-- Ícono lápiz -->
+   <!-- Visualizar -->
+              <a href="{% url 'modificar_proyecto' proyecto.pk %}" class="text-indigo-600 hover:text-indigo-800" title="Modificar">
   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M6.5 18.5l11-11M13 3l7 7-11 11H2v-7L13 3z"/>
   </svg>
-</span>
+</a>
 
 
               <!-- Eliminar -->
